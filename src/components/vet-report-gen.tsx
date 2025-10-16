@@ -295,7 +295,7 @@ export default function VetReportGen() {
       <CardHeader className="text-center">
         <div className="flex justify-center items-center gap-4 mb-4">
             <HeartPulse className="w-12 h-12 text-primary" />
-            <CardTitle className="text-3xl font-headline">VETReportGen</CardTitle>
+            <CardTitle className="text-3xl font-headline">HEMATOLOGIA</CardTitle>
         </div>
         <CardDescription className="text-lg">
           Generador de Informes de Hematología
