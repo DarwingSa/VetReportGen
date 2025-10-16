@@ -49,6 +49,36 @@ export default function VetReportGen() {
     },
   });
 
+  const processedCsvData = useMemo(() => {
+    if (!csvData) return null;
+    
+    const referenceRanges = form.watch('species') === 'Canino' ? dogReferenceRanges : catReferenceRanges;
+    
+    const results = csvData.results.map(res => {
+        const value = parseFloat(res.result);
+        const range = referenceRanges[res.parameter];
+        let indicator: ResultRow['indicator'] = '';
+        let rangeStr = 'N/A';
+
+        if (!isNaN(value) && range) {
+            if (value > range.max) indicator = '↑';
+            if (value < range.min) indicator = '↓';
+            rangeStr = `${range.min.toFixed(2)} - ${range.max.toFixed(2)}`;
+        }
+        
+        return {
+            ...res,
+            result: isNaN(value) ? res.result : value.toFixed(2),
+            indicator,
+            range: rangeStr,
+            unit: res.unit || range?.unit || ''
+        };
+    });
+
+    return { ...csvData, results };
+  }, [csvData, form.watch('species')]);
+
+
   const parseHeader = (header: string): { parameter: string; unit: string } => {
     const match = header.match(/(.+?)\((.+?)\)/);
     if (match && match[1] && match[2] !== undefined) {
@@ -154,11 +184,11 @@ export default function VetReportGen() {
   };
 
   const handleGenerateReport = (formData: FormData) => {
-    if (!csvData) return;
+    if (!processedCsvData) return;
 
     const referenceRanges = formData.species === 'Canino' ? dogReferenceRanges : catReferenceRanges;
     
-    const finalResults = csvData.results.map(res => {
+    const finalResults = processedCsvData.results.map(res => {
         const value = parseFloat(res.result);
         const range = referenceRanges[res.parameter];
         let indicator: ResultRow['indicator'] = '';
@@ -181,7 +211,7 @@ export default function VetReportGen() {
 
 
     const fullPatientData: PatientData = {
-      ...csvData.patient,
+      ...processedCsvData.patient,
       ...formData,
       vet: 'DR. Eduardo Peña',
     };
