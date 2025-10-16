@@ -1,21 +1,52 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, Loader2, HeartPulse } from 'lucide-react';
+import { UploadCloud, Loader2, HeartPulse, FileHeart } from 'lucide-react';
 import Report from '@/components/report';
-import type { ReportData, ResultRow } from '@/lib/hematology-data';
-import { dogReferenceRanges, parametersToInclude } from '@/lib/hematology-data';
+import type { ReportData, ResultRow, CsvData, PatientData } from '@/lib/hematology-data';
+import { dogReferenceRanges, catReferenceRanges, NON_MEDICAL_HEADERS } from '@/lib/hematology-data';
+
+const FormSchema = z.object({
+  ownerName: z.string().min(1, 'El nombre del dueño es requerido.'),
+  petName: z.string().min(1, 'El nombre de la mascota es requerido.'),
+  address: z.string().min(1, 'La dirección es requerida.'),
+  species: z.enum(['Canino', 'Felino'], { required_error: 'Debe seleccionar una especie.' }),
+  age: z.string().min(1, 'La edad es requerida.'),
+  sex: z.string().min(1, 'El sexo es requerido.'),
+});
+
+type FormData = z.infer<typeof FormSchema>;
 
 export default function VetReportGen() {
+  const [csvData, setCsvData] = useState<CsvData | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Esperando archivo CSV...');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      ownerName: '',
+      petName: '',
+      address: '',
+      species: 'Canino',
+      age: '',
+      sex: '',
+    },
+  });
 
   const parseHeader = (header: string): { parameter: string; unit: string } => {
     const match = header.match(/(.+?)\((.+?)\)/);
@@ -25,54 +56,43 @@ export default function VetReportGen() {
     return { parameter: header.trim(), unit: '' };
   };
 
-  const processCsvData = (csvText: string): ReportData | null => {
+  const processCsvData = (csvText: string): CsvData | null => {
     try {
       const lines = csvText.trim().split(/\r?\n/);
       if (lines.length < 2) throw new Error('El CSV debe tener al menos una cabecera y una fila de datos.');
       
-      const headers = lines[0].split(',');
-      const values = lines[1].split(',');
+      const headers = lines[0].split(',').map(h => h.trim());
+      const values = lines[1].split(',').map(v => v.trim());
       const rowData: { [key: string]: string } = {};
 
       headers.forEach((header, index) => {
-        rowData[header.trim()] = values[index]?.trim();
+        rowData[header] = values[index];
       });
 
       const sampleId = rowData['ID mstra.'] || 'Desconocido';
       if (!sampleId) throw new Error('No se encontró la columna "ID mstra.".');
       
-      const speciesHeader = headers.find(h => h.startsWith('Especie')) || 'Especie()';
-      
       const patientData = {
         id: sampleId,
-        species: rowData[speciesHeader] || 'Perro',
         date: rowData['Tiempo'] || new Date().toLocaleDateString('es-ES'),
-        owner: 'SRA ISI', // Valor de ejemplo
       };
 
       const results: ResultRow[] = [];
       
       for (const header of headers) {
+        if (NON_MEDICAL_HEADERS.some(nonMedHeader => header.startsWith(nonMedHeader))) continue;
+        
         const { parameter: paramName, unit: paramUnit } = parseHeader(header);
+        const valueStr = rowData[header];
 
-        if (parametersToInclude.includes(paramName)) {
-          const valueStr = rowData[header];
-          const value = parseFloat(valueStr);
-          const range = dogReferenceRanges[paramName];
-          
-          if (!isNaN(value) && range) {
-            let indicator: ResultRow['indicator'] = '';
-            if (value > range.max) indicator = '↑';
-            if (value < range.min) indicator = '↓';
-            
-            results.push({
-              parameter: paramName,
-              result: value.toFixed(2),
-              indicator,
-              range: `${range.min.toFixed(2)} - ${range.max.toFixed(2)}`,
-              unit: paramUnit || range.unit,
-            });
-          }
+        if (valueStr !== undefined) {
+           results.push({
+            parameter: paramName,
+            result: valueStr,
+            indicator: '',
+            range: '',
+            unit: paramUnit,
+          });
         }
       }
 
@@ -112,9 +132,8 @@ export default function VetReportGen() {
       const text = e.target?.result as string;
       const data = processCsvData(text);
       if (data) {
-        setReportData(data);
-        setStatus(`Informe '${data.patient.id}.pdf' listo para generar.`);
-        document.title = `Informe - ${data.patient.id}`;
+        setCsvData(data);
+        setStatus('Archivo cargado. Por favor, complete los datos del paciente.');
       } else {
         setStatus('Error al procesar el archivo. Inténtalo de nuevo.');
       }
@@ -133,14 +152,141 @@ export default function VetReportGen() {
     event.target.value = ''; // Reset file input
   };
 
+  const handleGenerateReport = (formData: FormData) => {
+    if (!csvData) return;
+
+    const referenceRanges = formData.species === 'Canino' ? dogReferenceRanges : catReferenceRanges;
+    
+    const finalResults = csvData.results.map(res => {
+        const value = parseFloat(res.result);
+        const range = referenceRanges[res.parameter];
+        let indicator: ResultRow['indicator'] = '';
+        let rangeStr = 'N/A';
+
+        if (!isNaN(value) && range) {
+            if (value > range.max) indicator = '↑';
+            if (value < range.min) indicator = '↓';
+            rangeStr = `${range.min.toFixed(2)} - ${range.max.toFixed(2)}`;
+        }
+        
+        return {
+            ...res,
+            result: isNaN(value) ? res.result : value.toFixed(2),
+            indicator,
+            range: rangeStr,
+            unit: res.unit || range?.unit || ''
+        };
+    });
+
+
+    const fullPatientData: PatientData = {
+      ...csvData.patient,
+      ...formData,
+      vet: 'DR. Eduardo Peña',
+    };
+    
+    setReportData({ patient: fullPatientData, results: finalResults });
+    document.title = `Informe - ${fullPatientData.id}`;
+  };
+
   const handleReset = () => {
+    setCsvData(null);
     setReportData(null);
     setStatus('Esperando archivo CSV...');
+    form.reset();
     document.title = 'VETReportGen';
   };
 
   if (reportData) {
     return <Report data={reportData} onReset={handleReset} />;
+  }
+
+  if (csvData) {
+    return (
+      <Card className="w-full max-w-2xl shadow-2xl bg-card">
+        <CardHeader className="text-center">
+            <div className="flex justify-center items-center gap-4 mb-4">
+                <FileHeart className="w-12 h-12 text-primary" />
+                <CardTitle className="text-3xl font-headline">Datos del Paciente</CardTitle>
+            </div>
+            <CardDescription className="text-lg">
+              Complete la información para generar el informe.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleGenerateReport)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="ownerName" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Nombre del dueño</FormLabel>
+                            <FormControl><Input placeholder="Ej: Juan Pérez" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField control={form.control} name="petName" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Nombre de la mascota</FormLabel>
+                            <FormControl><Input placeholder="Ej: Firulais" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                </div>
+
+                <FormField control={form.control} name="address" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Dirección</FormLabel>
+                        <FormControl><Input placeholder="Ej: Av. Siempre Viva 123" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField control={form.control} name="species" render={({ field }) => (
+                         <FormItem>
+                            <FormLabel>Especie</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione una especie" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="Canino">Canino</SelectItem>
+                                    <SelectItem value="Felino">Felino</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                     <FormField control={form.control} name="age" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Edad</FormLabel>
+                            <FormControl><Input placeholder="Ej: 5 años" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                     <FormField control={form.control} name="sex" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Sexo</FormLabel>
+                            <FormControl><Input placeholder="Ej: Macho" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                </div>
+                 <div className="space-y-2">
+                    <Label>Médico Veterinario</Label>
+                    <p className="text-sm font-medium p-2 border rounded-md bg-muted">DR. Eduardo Peña</p>
+                </div>
+              <CardFooter className="flex justify-end gap-2 p-0 pt-6">
+                  <Button type="button" variant="outline" onClick={handleReset}>Cancelar</Button>
+                  <Button type="submit">Generar Informe PDF</Button>
+              </CardFooter>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -167,7 +313,7 @@ export default function VetReportGen() {
             ) : (
               <UploadCloud className="mr-2 h-4 w-4" />
             )}
-            {isLoading ? 'Procesando...' : 'Seleccionar CSV y Generar Informe'}
+            {isLoading ? 'Procesando...' : 'Seleccionar Archivo CSV'}
           </Button>
           <input
             type="file"
