@@ -46,6 +46,10 @@ const ResultColumn = ({ results }: { results: ResultRow[] }) => (
 export default function Report({ data, onReset }: ReportProps) {
   const { patient, results } = data;
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const numColumns = results.length > 15 ? 2 : 1;
   const midPoint = Math.ceil(results.length / numColumns);
   const firstColumnResults = results.slice(0, midPoint);
@@ -55,7 +59,7 @@ export default function Report({ data, onReset }: ReportProps) {
   return (
     <div className="w-full max-w-5xl">
       <div className="flex justify-end gap-2 mb-4 no-print">
-        <Button onClick={() => window.print()}>
+        <Button onClick={handlePrint}>
           <Printer className="mr-2 h-4 w-4" />
           Imprimir o Guardar como PDF
         </Button>

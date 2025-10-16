@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -48,36 +48,6 @@ export default function VetReportGen() {
       sex: '',
     },
   });
-
-  const processedCsvData = useMemo(() => {
-    if (!csvData) return null;
-    
-    const referenceRanges = form.watch('species') === 'Canino' ? dogReferenceRanges : catReferenceRanges;
-    
-    const results = csvData.results.map(res => {
-        const value = parseFloat(res.result);
-        const range = referenceRanges[res.parameter];
-        let indicator: ResultRow['indicator'] = '';
-        let rangeStr = 'N/A';
-
-        if (!isNaN(value) && range) {
-            if (value > range.max) indicator = '↑';
-            if (value < range.min) indicator = '↓';
-            rangeStr = `${range.min.toFixed(2)} - ${range.max.toFixed(2)}`;
-        }
-        
-        return {
-            ...res,
-            result: isNaN(value) ? res.result : value.toFixed(2),
-            indicator,
-            range: rangeStr,
-            unit: res.unit || range?.unit || ''
-        };
-    });
-
-    return { ...csvData, results };
-  }, [csvData, form.watch('species')]);
-
 
   const parseHeader = (header: string): { parameter: string; unit: string } => {
     const match = header.match(/(.+?)\((.+?)\)/);
@@ -184,11 +154,11 @@ export default function VetReportGen() {
   };
 
   const handleGenerateReport = (formData: FormData) => {
-    if (!processedCsvData) return;
+    if (!csvData) return;
 
     const referenceRanges = formData.species === 'Canino' ? dogReferenceRanges : catReferenceRanges;
     
-    const finalResults = processedCsvData.results.map(res => {
+    const finalResults = csvData.results.map(res => {
         const value = parseFloat(res.result);
         const range = referenceRanges[res.parameter];
         let indicator: ResultRow['indicator'] = '';
@@ -211,7 +181,7 @@ export default function VetReportGen() {
 
 
     const fullPatientData: PatientData = {
-      ...processedCsvData.patient,
+      ...csvData.patient,
       ...formData,
       vet: 'DR. Eduardo Peña',
     };
