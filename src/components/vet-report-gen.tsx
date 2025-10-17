@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { UploadCloud, Loader2, HeartPulse, FileHeart } from 'lucide-react';
 import Report from '@/components/report';
 import type { ReportData, ResultRow, CsvData, PatientData } from '@/lib/hematology-data';
-import { dogReferenceRanges, catReferenceRanges, NON_MEDICAL_HEADERS } from '@/lib/hematology-data';
+import { dogReferenceRanges, catReferenceRanges } from '@/lib/hematology-data';
 
 const FormSchema = z.object({
   ownerName: z.string().min(1, 'El nombre del dueño es requerido.'),
@@ -28,6 +28,10 @@ const FormSchema = z.object({
 });
 
 type FormData = z.infer<typeof FormSchema>;
+
+// Encabezados que no son resultados médicos y deben ser ignorados
+const NON_MEDICAL_HEADERS = ['ID mstra.', 'Tiempo', 'Especie', 'Modo'];
+
 
 export default function VetReportGen() {
   const [csvData, setCsvData] = useState<CsvData | null>(null);
@@ -49,12 +53,9 @@ export default function VetReportGen() {
     },
   });
 
-  const parseHeader = (header: string): { parameter: string; unit: string } => {
-    const match = header.match(/(.+?)\((.+?)\)/);
-    if (match && match[1] && match[2] !== undefined) {
-      return { parameter: match[1].trim(), unit: match[2].trim() };
-    }
-    return { parameter: header.trim(), unit: '' };
+  const parseParameter = (header: string): string => {
+      const match = header.match(/(.+?)(?:\s*\(.+\))?$/);
+      return match ? match[1].trim() : header.trim();
   };
 
   const processCsvData = (csvText: string): CsvData | null => {
@@ -81,9 +82,9 @@ export default function VetReportGen() {
       const results: ResultRow[] = [];
       
       for (const header of headers) {
-        if (NON_MEDICAL_HEADERS.some(nonMedHeader => header.startsWith(nonMedHeader))) continue;
+        if (NON_MEDICAL_HEADERS.includes(header)) continue;
         
-        const { parameter: paramName, unit: paramUnit } = parseHeader(header);
+        const paramName = parseParameter(header);
         const valueStr = rowData[header];
 
         if (valueStr !== undefined) {
@@ -92,7 +93,7 @@ export default function VetReportGen() {
             result: valueStr,
             indicator: '',
             range: '',
-            unit: paramUnit,
+            unit: '', // Se determinará después con los rangos de referencia
           });
         }
       }
@@ -160,14 +161,16 @@ export default function VetReportGen() {
     
     const finalResults = csvData.results.map(res => {
         const value = parseFloat(res.result);
-        const range = referenceRanges[res.parameter];
+        const rangeInfo = referenceRanges[res.parameter];
         let indicator: ResultRow['indicator'] = '';
         let rangeStr = 'N/A';
+        let unit = '';
 
-        if (!isNaN(value) && range) {
-            if (value > range.max) indicator = '↑';
-            if (value < range.min) indicator = '↓';
-            rangeStr = `${range.min.toFixed(2)} - ${range.max.toFixed(2)}`;
+        if (!isNaN(value) && rangeInfo) {
+            if (value > rangeInfo.max) indicator = '↑';
+            if (value < rangeInfo.min) indicator = '↓';
+            rangeStr = `${rangeInfo.min.toFixed(2)} - ${rangeInfo.max.toFixed(2)}`;
+            unit = rangeInfo.unit;
         }
         
         return {
@@ -175,7 +178,7 @@ export default function VetReportGen() {
             result: isNaN(value) ? res.result : value.toFixed(2),
             indicator,
             range: rangeStr,
-            unit: res.unit || range?.unit || ''
+            unit: unit
         };
     });
 

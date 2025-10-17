@@ -68,5 +68,3 @@ export const catReferenceRanges: { [key: string]: { min: number; max: number; un
     'MON%': { min: 1.0, max: 4.0, unit: '%' },
     'GRA%': { min: 35.0, max: 75.0, unit: '%' },
 };
-
-export const NON_MEDICAL_HEADERS = ['ID mstra.', 'Tiempo', 'Especie'];
