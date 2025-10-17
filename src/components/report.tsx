@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Printer, ArrowUp, ArrowDown, FilePlus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import Image from 'next/image';
 
 interface ReportProps {
   data: ReportData;
@@ -52,10 +51,10 @@ export default function Report({ data, onReset }: ReportProps) {
     window.print();
   };
 
-  const numColumns = results.length > 15 ? 2 : 1;
-  const midPoint = Math.ceil(results.length / numColumns);
+  const useTwoColumns = results.length > 15;
+  const midPoint = useTwoColumns ? Math.ceil(results.length / 2) : results.length;
   const firstColumnResults = results.slice(0, midPoint);
-  const secondColumnResults = results.slice(midPoint);
+  const secondColumnResults = useTwoColumns ? results.slice(midPoint) : [];
 
 
   return (
@@ -79,15 +78,15 @@ export default function Report({ data, onReset }: ReportProps) {
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
                 {/* 
-                  CAMBIA EL LOGO AQUÍ:
-                  1. Sube tu logo a la carpeta 'public' en la raíz de tu proyecto.
-                  2. Reemplaza '/logo-placeholder.png' con la ruta a tu logo (ej: '/mi-logo.png').
+                  Usamos una etiqueta <img> estándar en lugar del componente <Image> de Next.js
+                  para asegurar la compatibilidad con la función de impresión a PDF.
+                  Tu logo debe estar en la carpeta 'public'.
                 */}
-                <Image 
+                <img 
                   src="/1000186359.png" 
                   alt="Logo de la clínica" 
-                  width={64} 
-                  height={64} 
+                  width="64"
+                  height="64"
                   className="w-16 h-16"
                 />
             </div>
@@ -112,7 +111,7 @@ export default function Report({ data, onReset }: ReportProps) {
             <Separator className="my-4" />
             <h3 className="text-lg font-semibold mb-2 font-headline">Resultados</h3>
             
-            <div className={`grid grid-cols-1 ${numColumns > 1 ? 'lg:grid-cols-2' : ''} gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4`}>
+            <div className={`grid grid-cols-1 ${useTwoColumns ? 'lg:grid-cols-2' : ''} gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4`}>
                 <div className="flex flex-col gap-4">
                     <ResultColumn results={firstColumnResults} />
                 </div>
