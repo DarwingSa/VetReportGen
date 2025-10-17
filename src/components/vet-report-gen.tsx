@@ -30,7 +30,7 @@ const FormSchema = z.object({
 type FormData = z.infer<typeof FormSchema>;
 
 // Encabezados que no son resultados médicos y deben ser ignorados
-const NON_MEDICAL_HEADERS = ['ID mstra.', 'Tiempo', 'Especie', 'Modo'];
+const NON_MEDICAL_HEADERS = ['ID mstra.', 'Tiempo', 'Modo', 'Especie()'];
 
 
 export default function VetReportGen() {
