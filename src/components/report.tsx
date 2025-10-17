@@ -1,11 +1,13 @@
+
 'use client';
 
 import type { ReportData, ResultRow } from '@/lib/hematology-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Printer, ArrowUp, ArrowDown, FilePlus, HeartPulse } from 'lucide-react';
+import { Printer, ArrowUp, ArrowDown, FilePlus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 interface ReportProps {
   data: ReportData;
@@ -76,8 +78,18 @@ export default function Report({ data, onReset }: ReportProps) {
                     <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HUOSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
-                {/* ESTE ES EL LOGO QUE PUEDES CAMBIAR */}
-                <HeartPulse className="w-16 h-16 text-primary" />
+                {/* 
+                  CAMBIA EL LOGO AQUÍ:
+                  1. Sube tu logo a la carpeta 'public' en la raíz de tu proyecto.
+                  2. Reemplaza '/logo-placeholder.png' con la ruta a tu logo (ej: '/mi-logo.png').
+                */}
+                <Image 
+                  src="/logo-placeholder.png" 
+                  alt="Logo de la clínica" 
+                  width={64} 
+                  height={64} 
+                  className="w-16 h-16"
+                />
             </div>
         </CardHeader>
         <CardContent className="p-2 sm:p-6">
