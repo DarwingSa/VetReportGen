@@ -5,7 +5,7 @@ import type { ReportData, ResultRow } from '@/lib/hematology-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Printer, ArrowUp, ArrowDown, FilePlus } from 'lucide-react';
+import { Printer, ArrowUp, ArrowDown, FilePlus, HeartPulse } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 interface ReportProps {
@@ -77,17 +77,7 @@ export default function Report({ data, onReset }: ReportProps) {
                     <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HUOSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
-                {/* 
-                  Asegúrate de que el archivo '1000186359.png' exista en la carpeta 'public'.
-                  Se usa <img> en lugar de <Image> de Next.js para asegurar que aparezca en el PDF.
-                */}
-                <img 
-                  src="/LOGO.png" 
-                  alt="Logo de la clínica" 
-                  width="64"
-                  height="64"
-                  className="w-16 h-16"
-                />
+                <HeartPulse className="w-16 h-16 text-primary" />
             </div>
         </CardHeader>
         <CardContent className="p-2 sm:p-6">
@@ -111,14 +101,10 @@ export default function Report({ data, onReset }: ReportProps) {
             <h3 className="text-lg font-semibold mb-2 font-headline">Resultados</h3>
             
             <div className={`grid grid-cols-1 ${useTwoColumns ? 'lg:grid-cols-2' : ''} gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4`}>
-                <div className="flex flex-col gap-4">
-                    <ResultColumn results={firstColumnResults} />
-                </div>
-                 {secondColumnResults.length > 0 && (
-                    <div className="flex flex-col gap-4">
-                        <ResultColumn results={secondColumnResults} />
-                    </div>
-                 )}
+                <ResultColumn results={firstColumnResults} />
+                {useTwoColumns && (
+                    <ResultColumn results={secondColumnResults} />
+                )}
             </div>
 
             <div className="mt-8 text-xs text-muted-foreground text-center">
