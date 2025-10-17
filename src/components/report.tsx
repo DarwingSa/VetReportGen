@@ -82,7 +82,7 @@ export default function Report({ data, onReset }: ReportProps) {
                   Se usa <img> en lugar de <Image> de Next.js para asegurar que aparezca en el PDF.
                 */}
                 <img 
-                  src="/1000186359.png" 
+                  src="/LOGO.png" 
                   alt="Logo de la clínica" 
                   width="64"
                   height="64"
