@@ -71,7 +71,7 @@ export default function Report({ data, onReset }: ReportProps) {
         <CardHeader>
             <div className="flex items-start justify-between">
                 <div>
-                    <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HUOSE</CardTitle>
+                    <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HOUSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
                 <HeartPulse className="w-16 h-16 text-primary" />
@@ -111,7 +111,7 @@ export default function Report({ data, onReset }: ReportProps) {
 
             <div className="mt-8 text-xs text-muted-foreground text-center">
                 <p>LOS RANGOS DE REFERENCIA DEBEN SER INTERPRETADOS POR UN PROFESIONAL VETERINARIO.</p>
-                <p>THE PETS HUOSE - Contacto: (0412) 553-9134</p>
+                <p>THE PETS HOUSE - Contacto: (0412) 553-9134</p>
             </div>
         </CardContent>
       </Card>
