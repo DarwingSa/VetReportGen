@@ -84,7 +84,7 @@ export default function Report({ data, onReset }: ReportProps) {
                   2. Reemplaza '/logo-placeholder.png' con la ruta a tu logo (ej: '/mi-logo.png').
                 */}
                 <Image 
-                  src="/logo-placeholder.png" 
+                  src="/1000186359.png" 
                   alt="Logo de la clínica" 
                   width={64} 
                   height={64} 
