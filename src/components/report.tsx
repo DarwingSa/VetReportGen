@@ -76,6 +76,7 @@ export default function Report({ data, onReset }: ReportProps) {
                     <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HUOSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
+                {/* ESTE ES EL LOGO QUE PUEDES CAMBIAR */}
                 <HeartPulse className="w-16 h-16 text-primary" />
             </div>
         </CardHeader>
@@ -111,8 +112,8 @@ export default function Report({ data, onReset }: ReportProps) {
             </div>
 
             <div className="mt-8 text-xs text-muted-foreground text-center">
-                <p>Este es un informe autogenerado. Los rangos de referencia deben ser interpretados por un profesional veterinario.</p>
-                <p>THE PETS HUOSE - Contacto: (123) 456-7890</p>
+                <p>Los rangos de referencia deben ser interpretados por un profesional veterinario.</p>
+                <p>THE PETS HUOSE - Contacto: (0412) 553-9134</p>
             </div>
         </CardContent>
       </Card>
