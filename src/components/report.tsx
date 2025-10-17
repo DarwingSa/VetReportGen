@@ -77,8 +77,9 @@ export default function Report({ data, onReset }: ReportProps) {
                     <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HUOSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
+                {/* Asegúrate de que el archivo '1000186359.png' exista en la carpeta 'public' */}
                 <img 
-                  src="Public/1000186359.png" 
+                  src="/1000186359.png" 
                   alt="Logo de la clínica" 
                   width="64"
                   height="64"
