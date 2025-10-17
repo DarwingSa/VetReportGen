@@ -109,8 +109,9 @@ export default function Report({ data, onReset }: ReportProps) {
             </div>
 
             <div className="mt-8 text-xs text-muted-foreground text-center">
-                <p>Los rangos de referencia deben ser interpretados por un profesional veterinario.</p>
+                <p>LOS RANGOS DE REFERENCIA DEBEN SER INTERPRETADOS POR UN PROFESIONAL VETERINARIO.</p>
                 <p>THE PETS HUOSE - Contacto: (0412) 553-9134</p>
+                <p><Instagram>@thepetshousebm</Instagram></p>
             </div>
         </CardContent>
       </Card>
