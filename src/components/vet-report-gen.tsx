@@ -23,6 +23,7 @@ const FormSchema = z.object({
   petName: z.string().min(1, 'El nombre de la mascota es requerido.'),
   address: z.string().min(1, 'La dirección es requerida.'),
   species: z.enum(['Canino', 'Felino'], { required_error: 'Debe seleccionar una especie.' }),
+  race: z.string().min(1, 'La raza es requerida.'),
   age: z.string().min(1, 'La edad es requerida.'),
   sex: z.string().min(1, 'El sexo es requerido.'),
 });
@@ -48,6 +49,7 @@ export default function VetReportGen() {
       petName: '',
       address: '',
       species: 'Canino',
+      race: '',
       age: '',
       sex: '',
     },
@@ -245,7 +247,7 @@ export default function VetReportGen() {
                     </FormItem>
                 )} />
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <FormField control={form.control} name="species" render={({ field }) => (
                          <FormItem>
                             <FormLabel>Especie</FormLabel>
@@ -260,6 +262,13 @@ export default function VetReportGen() {
                                     <SelectItem value="Felino">Felino</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField control={form.control} name="race" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Raza</FormLabel>
+                            <FormControl><Input placeholder="Ej: Golden Retriever" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />

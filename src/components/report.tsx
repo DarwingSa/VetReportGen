@@ -89,6 +89,7 @@ export default function Report({ data, onReset }: ReportProps) {
                 <div><strong>Mascota:</strong> {patient.petName}</div>
                 <div><strong>Dirección:</strong> {patient.address}</div>
                 <div><strong>Especie:</strong> {patient.species}</div>
+                <div><strong>Raza:</strong> {patient.race}</div>
                 <div><strong>Edad:</strong> {patient.age}</div>
                 <div><strong>Sexo:</strong> {patient.sex}</div>
                 <div><strong>Fecha:</strong> {patient.date}</div>

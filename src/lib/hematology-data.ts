@@ -4,6 +4,7 @@ export interface PatientData {
   petName: string;
   address: string;
   species: 'Canino' | 'Felino';
+  race: string;
   age: string;
   sex: string;
   vet: string;
