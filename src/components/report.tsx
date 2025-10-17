@@ -77,7 +77,10 @@ export default function Report({ data, onReset }: ReportProps) {
                     <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HUOSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
-                {/* Asegúrate de que el archivo '1000186359.png' exista en la carpeta 'public' */}
+                {/* 
+                  Asegúrate de que el archivo '1000186359.png' exista en la carpeta 'public'.
+                  Se usa <img> en lugar de <Image> de Next.js para asegurar que aparezca en el PDF.
+                */}
                 <img 
                   src="/1000186359.png" 
                   alt="Logo de la clínica" 
