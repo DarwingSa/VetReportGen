@@ -13,7 +13,7 @@ interface ReportProps {
   onReset: () => void;
 }
 
-const ResultColumn = ({ results }: { results: ResultRow[] }) => (
+const ResultTable = ({ results }: { results: ResultRow[] }) => (
     <div className="rounded-md border">
         <Table>
             <TableHeader>
@@ -52,10 +52,7 @@ export default function Report({ data, onReset }: ReportProps) {
   };
 
   const useTwoColumns = results.length > 15;
-  const midPoint = useTwoColumns ? Math.ceil(results.length / 2) : results.length;
-  const firstColumnResults = results.slice(0, midPoint);
-  const secondColumnResults = useTwoColumns ? results.slice(midPoint) : [];
-
+  const midPoint = useTwoColumns ? Math.ceil(results.length / 2) : 0;
 
   return (
     <div className="w-full max-w-5xl">
@@ -101,17 +98,20 @@ export default function Report({ data, onReset }: ReportProps) {
             <Separator className="my-4" />
             <h3 className="text-lg font-semibold mb-2 font-headline">Resultados</h3>
             
-            <div className={`grid grid-cols-1 ${useTwoColumns ? 'lg:grid-cols-2' : ''} gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4`}>
-                <ResultColumn results={firstColumnResults} />
-                {useTwoColumns && (
-                    <ResultColumn results={secondColumnResults} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4">
+                {useTwoColumns ? (
+                  <>
+                    <ResultTable results={results.slice(0, midPoint)} />
+                    <ResultTable results={results.slice(midPoint)} />
+                  </>
+                ) : (
+                  <ResultTable results={results} />
                 )}
             </div>
 
             <div className="mt-8 text-xs text-muted-foreground text-center">
                 <p>LOS RANGOS DE REFERENCIA DEBEN SER INTERPRETADOS POR UN PROFESIONAL VETERINARIO.</p>
                 <p>THE PETS HUOSE - Contacto: (0412) 553-9134</p>
-                <p><Instagram>@thepetshousebm</Instagram></p>
             </div>
         </CardContent>
       </Card>

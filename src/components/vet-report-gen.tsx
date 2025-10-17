@@ -30,10 +30,6 @@ const FormSchema = z.object({
 
 type FormData = z.infer<typeof FormSchema>;
 
-// Encabezados que no son resultados médicos y deben ser ignorados
-const NON_MEDICAL_HEADERS = ['ID mstra.', 'Tiempo', 'Modo', 'Especie()'];
-
-
 export default function VetReportGen() {
   const [csvData, setCsvData] = useState<CsvData | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
@@ -55,11 +51,6 @@ export default function VetReportGen() {
     },
   });
 
-  const parseParameter = (header: string): string => {
-      const match = header.match(/(.+?)(?:\s*\(.+\))?$/);
-      return match ? match[1].trim() : header.trim();
-  };
-
   const processCsvData = (csvText: string): CsvData | null => {
     try {
       const lines = csvText.trim().split(/\r?\n/);
@@ -67,8 +58,11 @@ export default function VetReportGen() {
       
       const headers = lines[0].split(',').map(h => h.trim());
       const values = lines[1].split(',').map(v => v.trim());
+      
+      // Encabezados que no son resultados médicos y deben ser ignorados
+      const NON_MEDICAL_HEADERS = ['ID mstra.', 'Tiempo', 'Modo', 'Especie()'];
+      
       const rowData: { [key: string]: string } = {};
-
       headers.forEach((header, index) => {
         rowData[header] = values[index];
       });
@@ -86,7 +80,7 @@ export default function VetReportGen() {
       for (const header of headers) {
         if (NON_MEDICAL_HEADERS.includes(header)) continue;
         
-        const paramName = parseParameter(header);
+        const paramName = header.match(/(.+?)(?:\s*\(.+\))?$/)?.[1]?.trim() ?? header.trim();
         const valueStr = rowData[header];
 
         if (valueStr !== undefined) {
