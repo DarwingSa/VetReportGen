@@ -63,7 +63,7 @@ export default function Report({ data, onReset }: { data: ReportData, onReset: (
         </Button>
       </div>
 
-      <Card className="print-container rounded-lg shadow-lg bg-card p-3 sm:p-5">
+      <Card className="print-container rounded-lg shadow-lg bg-card p-3 sm:p-5 print:text-sm">
         <CardHeader className="print:p-3 print:pb-0">
             <div className="flex items-start justify-between">
                 <div>
