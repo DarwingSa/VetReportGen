@@ -74,7 +74,16 @@ export default function Report({ data, onReset }: ReportProps) {
                     <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HOUSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
-                <HeartPulse className="w-16 h-16 text-primary" />
+                <div className="text-right">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src="/logo.png"
+                    alt="Logo de la Clínica"
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                    />
+                </div>
             </div>
         </CardHeader>
         <CardContent className="p-2 sm:p-6">
