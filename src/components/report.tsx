@@ -5,7 +5,7 @@ import type { ReportData, ResultRow } from '@/lib/hematology-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Printer, ArrowUp, ArrowDown, FilePlus, HeartPulse } from 'lucide-react';
+import { Printer, ArrowUp, ArrowDown, FilePlus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 interface ReportProps {
@@ -50,7 +50,7 @@ export default function Report({ data, onReset }: ReportProps) {
   const handlePrint = () => {
     window.print();
   };
-
+  
   const useTwoColumns = results.length > 15;
   const midPoint = useTwoColumns ? Math.ceil(results.length / 2) : 0;
 
@@ -79,8 +79,8 @@ export default function Report({ data, onReset }: ReportProps) {
                   <img 
                     src="/logo.png"
                     alt="Logo de la Clínica"
-                    width={100}
-                    height={100}
+                    width={200}
+                    height={200}
                     className="object-contain"
                     />
                 </div>
@@ -108,7 +108,7 @@ export default function Report({ data, onReset }: ReportProps) {
             <h3 className="text-lg font-semibold mb-2 font-headline">Resultados</h3>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4">
-                {useTwoColumns ? (
+               {useTwoColumns ? (
                   <>
                     <ResultTable results={results.slice(0, midPoint)} />
                     <ResultTable results={results.slice(midPoint)} />
