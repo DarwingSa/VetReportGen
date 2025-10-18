@@ -8,11 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Printer, ArrowUp, ArrowDown, FilePlus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
-interface ReportProps {
-  data: ReportData;
-  onReset: () => void;
-}
-
 const ResultTable = ({ results }: { results: ResultRow[] }) => (
     <div className="rounded-md border">
         <Table>
@@ -51,9 +46,6 @@ export default function Report({ data, onReset }: ReportProps) {
     window.print();
   };
   
-  const useTwoColumns = results.length > 15;
-  const midPoint = useTwoColumns ? Math.ceil(results.length / 2) : 0;
-
   return (
     <div className="w-full max-w-5xl">
       <div className="flex justify-end gap-2 mb-4 no-print">
@@ -67,11 +59,11 @@ export default function Report({ data, onReset }: ReportProps) {
         </Button>
       </div>
 
-      <Card className="print-container rounded-lg shadow-lg bg-card p-4 sm:p-6">
-        <CardHeader>
+      <Card className="print-container rounded-lg shadow-lg bg-card p-3 sm:p-5">
+        <CardHeader className="print:p-3 print:pb-0">
             <div className="flex items-start justify-between">
                 <div>
-                    <CardTitle className="text-4xl font-headline text-card-foreground">THE PETS HOUSE</CardTitle>
+                    <CardTitle className="text-3xl font-headline text-card-foreground">THE PETS HOUSE</CardTitle>
                     <CardDescription className="text-xl">Informe de Hematología</CardDescription>
                 </div>
                 <div className="text-right">
@@ -79,17 +71,17 @@ export default function Report({ data, onReset }: ReportProps) {
                   <img 
                     src="/logo.png"
                     alt="Logo de la Clínica"
-                    width={200}
-                    height={200}
+                    width={150}
+                    height={120}
                     className="object-contain"
                     />
                 </div>
             </div>
         </CardHeader>
-        <CardContent className="p-2 sm:p-6">
-            <Separator className="my-4" />
+        <CardContent className="p-2 sm:p-4 print:p-3">
+            <Separator className="my-2 print:my-1" />
             <h3 className="text-lg font-semibold mb-2 font-headline">Datos del Paciente</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2 text-sm mb-6 p-4 bg-accent/50 rounded-md">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2 text-sm mb-6 p-3 print:p-2 bg-accent/50 rounded-md">
                 <div><strong>ID Muestra:</strong> {patient.id}</div>
                 <div><strong>Propietario:</strong> {patient.ownerName}</div>
                 <div><strong>Mascota:</strong> {patient.petName}</div>
@@ -104,18 +96,11 @@ export default function Report({ data, onReset }: ReportProps) {
                 <strong>M.V. que remite:</strong> {patient.vet}
             </div>
 
-            <Separator className="my-4" />
+            <Separator className="my-2 print:my-1" />
             <h3 className="text-lg font-semibold mb-2 font-headline">Resultados</h3>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4">
-               {useTwoColumns ? (
-                  <>
-                    <ResultTable results={results.slice(0, midPoint)} />
-                    <ResultTable results={results.slice(midPoint)} />
-                  </>
-                ) : (
-                  <ResultTable results={results} />
-                )}
+                <ResultTable results={results} />
             </div>
 
             <div className="mt-8 text-xs text-muted-foreground text-center">
@@ -127,3 +112,4 @@ export default function Report({ data, onReset }: ReportProps) {
     </div>
   );
 }
+
