@@ -39,12 +39,16 @@ const ResultTable = ({ results }: { results: ResultRow[] }) => (
 );
 
 
-export default function Report({ data, onReset }: ReportProps) {
+export default function Report({ data, onReset }: { data: ReportData, onReset: () => void }) {
   const { patient, results } = data;
 
   const handlePrint = () => {
     window.print();
   };
+
+  const midPoint = Math.ceil(results.length / 2);
+  const firstHalf = results.slice(0, midPoint);
+  const secondHalf = results.slice(midPoint);
   
   return (
     <div className="w-full max-w-5xl">
@@ -100,7 +104,12 @@ export default function Report({ data, onReset }: ReportProps) {
             <h3 className="text-lg font-semibold mb-2 font-headline">Resultados</h3>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4 print:grid-cols-2 print:gap-x-4">
-                <ResultTable results={results} />
+                 <div>
+                    <ResultTable results={firstHalf} />
+                </div>
+                <div>
+                    <ResultTable results={secondHalf} />
+                </div>
             </div>
 
             <div className="mt-8 text-xs text-muted-foreground text-center">
