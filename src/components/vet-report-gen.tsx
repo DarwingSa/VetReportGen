@@ -196,7 +196,7 @@ export default function VetReportGen({ onReportGenerated }: { onReportGenerated:
   
   if (csvData) {
     return (
-      <Card className="w-full max-w-2xl shadow-2xl bg-card">
+      <Card className="w-full max-w-4xl shadow-2xl bg-card">
         <CardHeader className="text-center">
             <div className="flex justify-center items-center gap-4 mb-4">
                 <FileHeart className="w-12 h-12 text-primary" />
@@ -290,7 +290,7 @@ export default function VetReportGen({ onReportGenerated }: { onReportGenerated:
   }
 
   return (
-    <Card className="w-full max-w-lg shadow-2xl bg-card">
+    <Card className="w-full max-w-4xl shadow-2xl bg-card">
       <CardHeader className="text-center">
         <div className="flex justify-center items-center gap-4 mb-4">
             <HeartPulse className="w-12 h-12 text-primary" />

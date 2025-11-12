@@ -5,8 +5,8 @@ import VetReportGen from '@/components/vet-report-gen';
 import Report from '@/components/report';
 import HistorySidebar from '@/components/history-sidebar';
 import type { ReportData } from '@/lib/hematology-data';
-import { SidebarProvider, Sidebar, SidebarInset, SidebarTrigger, SidebarHeader, SidebarContent, SidebarFooter } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<'form' | 'report'>('form');
@@ -65,34 +65,27 @@ export default function Home() {
   };
 
   return (
-    <SidebarProvider>
-       <main className="flex min-h-screen bg-background">
-        <Sidebar>
-            <SidebarHeader>
-                 <SidebarTrigger />
-            </SidebarHeader>
-             <SidebarContent>
-                <HistorySidebar
-                    history={history}
-                    onSelectReport={handleSelectReportFromHistory}
-                    onDeleteReport={handleDeleteReport}
-                />
-            </SidebarContent>
-            <SidebarFooter>
-                 <Button variant="destructive" onClick={handleClearHistory} disabled={history.length === 0}>
-                    Borrar Historial
-                </Button>
-            </SidebarFooter>
-        </Sidebar>
-        <SidebarInset>
-            <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 min-h-screen">
-                {currentView === 'form' && <VetReportGen onReportGenerated={handleReportGenerated} />}
-                {currentView === 'report' && activeReport && (
-                    <Report data={activeReport} onReset={handleShowForm} />
-                )}
+    <main className="flex flex-col items-center justify-start p-4 sm:p-6 md:p-8 min-h-screen bg-background">
+        {currentView === 'form' && (
+          <div className="w-full max-w-4xl">
+            <VetReportGen onReportGenerated={handleReportGenerated} />
+            <Separator className="my-8" />
+            <div className="mb-4 flex justify-between items-center">
+              <h2 className="text-2xl font-headline font-semibold">Historial de Informes</h2>
+              <Button variant="destructive" onClick={handleClearHistory} disabled={history.length === 0}>
+                  Borrar Historial
+              </Button>
             </div>
-        </SidebarInset>
-       </main>
-    </SidebarProvider>
+            <HistorySidebar
+                history={history}
+                onSelectReport={handleSelectReportFromHistory}
+                onDeleteReport={handleDeleteReport}
+            />
+          </div>
+        )}
+        {currentView === 'report' && activeReport && (
+            <Report data={activeReport} onReset={handleShowForm} />
+        )}
+    </main>
   );
 }
