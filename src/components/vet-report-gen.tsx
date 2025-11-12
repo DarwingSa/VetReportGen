@@ -14,7 +14,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { UploadCloud, Loader2, HeartPulse, FileHeart } from 'lucide-react';
-import Report from '@/components/report';
 import type { ReportData, ResultRow, CsvData, PatientData } from '@/lib/hematology-data';
 import { dogReferenceRanges, catReferenceRanges } from '@/lib/hematology-data';
 
@@ -30,9 +29,8 @@ const FormSchema = z.object({
 
 type FormData = z.infer<typeof FormSchema>;
 
-export default function VetReportGen() {
+export default function VetReportGen({ onReportGenerated }: { onReportGenerated: (data: ReportData) => void }) {
   const [csvData, setCsvData] = useState<CsvData | null>(null);
-  const [reportData, setReportData] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Esperando archivo CSV...');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +49,7 @@ export default function VetReportGen() {
     },
   });
 
-  const processCsvData = (csvText: string): CsvData | null => {
+ const processCsvData = (csvText: string): CsvData | null => {
     try {
       const lines = csvText.trim().split(/\r?\n/);
       if (lines.length < 2) throw new Error('El CSV debe tener al menos una cabecera y una fila de datos.');
@@ -59,16 +57,14 @@ export default function VetReportGen() {
       const headers = lines[0].split(',').map(h => h.trim());
       const values = lines[1].split(',').map(v => v.trim());
       
-      // Encabezados que no son resultados médicos y deben ser ignorados
       const NON_MEDICAL_HEADERS = ['ID mstra.', 'Tiempo', 'Modo', 'Especie()'];
       
       const rowData: { [key: string]: string } = {};
       headers.forEach((header, index) => {
         rowData[header] = values[index];
       });
-
-      const sampleId = rowData['ID mstra.'] || 'Desconocido';
-      if (!sampleId) throw new Error('No se encontró la columna "ID mstra.".');
+  
+      const sampleId = rowData['ID mstra.'] || `rep-${Date.now()}`;
       
       const patientData = {
         id: sampleId,
@@ -89,7 +85,7 @@ export default function VetReportGen() {
             result: valueStr,
             indicator: '',
             range: '',
-            unit: '', // Se determinará después con los rangos de referencia
+            unit: '',
           });
         }
       }
@@ -134,6 +130,7 @@ export default function VetReportGen() {
         setStatus('Archivo cargado. Por favor, complete los datos del paciente.');
       } else {
         setStatus('Error al procesar el archivo. Inténtalo de nuevo.');
+        handleReset();
       }
       setIsLoading(false);
     };
@@ -147,7 +144,7 @@ export default function VetReportGen() {
       setStatus('Error al leer el archivo.');
     };
     reader.readAsText(file);
-    event.target.value = ''; // Reset file input
+    event.target.value = '';
   };
 
   const handleGenerateReport = (formData: FormData) => {
@@ -185,22 +182,18 @@ export default function VetReportGen() {
       vet: 'DR. Eduardo Peña',
     };
     
-    setReportData({ patient: fullPatientData, results: finalResults });
+    const newReportData = { patient: fullPatientData, results: finalResults };
     document.title = `Informe - ${fullPatientData.id}`;
+    onReportGenerated(newReportData);
   };
 
   const handleReset = () => {
     setCsvData(null);
-    setReportData(null);
     setStatus('Esperando archivo CSV...');
     form.reset();
     document.title = 'VETReportGen';
   };
-
-  if (reportData) {
-    return <Report data={reportData} onReset={handleReset} />;
-  }
-
+  
   if (csvData) {
     return (
       <Card className="w-full max-w-2xl shadow-2xl bg-card">

@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { ReportData, ResultRow } from '@/lib/hematology-data';
@@ -121,4 +120,3 @@ export default function Report({ data, onReset }: { data: ReportData, onReset: (
     </div>
   );
 }
-
