@@ -25,6 +25,7 @@ const FormSchema = z.object({
   race: z.string().min(1, 'La raza es requerida.'),
   age: z.string().min(1, 'La edad es requerida.'),
   sex: z.string().min(1, 'El sexo es requerido.'),
+  weight: z.string().min(1, 'El peso es requerido.'),
 });
 
 type FormData = z.infer<typeof FormSchema>;
@@ -46,6 +47,7 @@ export default function VetReportGen({ onReportGenerated }: { onReportGenerated:
       race: '',
       age: '',
       sex: '',
+      weight: '',
     },
   });
 
@@ -234,7 +236,7 @@ export default function VetReportGen({ onReportGenerated }: { onReportGenerated:
                     </FormItem>
                 )} />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     <FormField control={form.control} name="species" render={({ field }) => (
                          <FormItem>
                             <FormLabel>Especie</FormLabel>
@@ -270,6 +272,13 @@ export default function VetReportGen({ onReportGenerated }: { onReportGenerated:
                         <FormItem>
                             <FormLabel>Sexo</FormLabel>
                             <FormControl><Input placeholder="Ej: Macho" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                     <FormField control={form.control} name="weight" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Peso</FormLabel>
+                            <FormControl><Input placeholder="Ej: 10 Kg" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />

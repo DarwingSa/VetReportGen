@@ -93,6 +93,7 @@ export default function Report({ data, onReset }: { data: ReportData, onReset: (
                 <div><strong>Raza:</strong> {patient.race}</div>
                 <div><strong>Edad:</strong> {patient.age}</div>
                 <div><strong>Sexo:</strong> {patient.sex}</div>
+                <div><strong>Peso:</strong> {patient.weight}</div>
                 <div><strong>Fecha:</strong> {patient.date}</div>
             </div>
              <div className="mb-6">

@@ -7,6 +7,7 @@ export interface PatientData {
   race: string;
   age: string;
   sex: string;
+  weight: string;
   vet: string;
   date: string;
 }
